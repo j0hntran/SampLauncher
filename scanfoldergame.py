@@ -2,7 +2,9 @@ import os
 import requests
 import winreg
 import json
+import time
 from hashlib import sha256
+thoigian = time.ctime()
 
 def calculate_sha256(file_path):
     sha256_hash = sha256()
@@ -43,7 +45,7 @@ def send_discord_webhook(message):
         print(f"Failed to send webhook: {e}")
 
 if __name__ == "__main__":
-    game_directory = r"D:/Download/Modpak/cleo"
+    game_directory = r"D:/Download/Modpak/zin"
     json_url = "https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/checksums.json"
 
     stored_checksums = fetch_json_from_url(json_url)
@@ -60,7 +62,7 @@ if __name__ == "__main__":
             print("Các tệp trùng khớp:")
             for file_path in matching_files:
                 print(file_path)
-                message = "Cleo detected:{}\nIC:{}".format(file_path,player[0])
+                message = "**Cleo detected!.**\nFilepath: {}\nIC: {}\nTime: {}".format(file_path,player[0],thoigian)
                 send_discord_webhook(message)
             
             
