@@ -20,7 +20,6 @@ def check_and_download_files(folder_path):
     files_to_download = [file_name for file_name in required_files if file_name not in files_in_folder]
 
     if files_to_download:
-        print(f"Các file cần tải: {files_to_download}")
         for file_name in files_to_download:
             download_url = f"https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{file_name}"
             download_path = os.path.join(folder_path, file_name)
