@@ -26,6 +26,8 @@ def check_and_download_files(folder_path):
     response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cache.json")
     if response.status_code == 200:
         required_files = response.json()
+        fileneeddownload = len(required_files)-len(files_in_folder)
+        print(f"Số file cần download: {fileneeddownload}")
     else:
         print(f"Lỗi khi lấy danh sách file từ máy chủ. Mã trạng thái: {response.status_code}")
         return
