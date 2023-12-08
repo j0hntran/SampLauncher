@@ -35,5 +35,4 @@ def check_and_download_files(folder_path):
     else:
         print("Không có file nào thiếu.")
 
-# Sử dụng hàm
 check_and_download_files("C:/Users/"+user+"/Documents/GTA San Andreas User Files/SAMP/cache/15.235.197.168.7777")
