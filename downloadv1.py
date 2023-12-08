@@ -10,7 +10,7 @@ def check_and_download_files(folder_path):
 
     files_in_folder = os.listdir(folder_path)
 
-    response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/file_info.json")
+    response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cache.json")
     if response.status_code == 200:
         required_files = response.json()
     else:
@@ -22,7 +22,7 @@ def check_and_download_files(folder_path):
     if files_to_download:
         print(f"Các file cần tải: {files_to_download}")
         for file_name in files_to_download:
-            download_url = f"http://upfile.myftp.org/Cache/{file_name}"
+            download_url = f"https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{file_name}"
             download_path = os.path.join(folder_path, file_name)
 
             response = requests.get(download_url)
