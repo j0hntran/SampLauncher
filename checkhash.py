@@ -19,7 +19,7 @@ def generate_checksums(directory):
     return checksums
 
 if __name__ == "__main__":
-    target_directory = r"D:/Download/Modpak/cleo"
+    target_directory = r"D:/Project/Cleodetected"
     output_json_file = "checksums.json"
 
     checksums = generate_checksums(target_directory)
