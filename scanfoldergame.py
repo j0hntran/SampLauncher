@@ -5,6 +5,59 @@ import json
 import time
 from hashlib import sha256
 thoigian = time.ctime()
+user = os.getlogin()
+date = time.ctime()
+launcher_version = 1.0
+def check_for_update():
+    response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/update.json")
+    if response.status_code == 200:
+        new_version = response.json()
+    else:
+        print(f"Lỗi khi kiểm tra cập nhật, mã phản hồi:{response.status_code}")
+    if launcher_version == new_version:
+        print("Bạn đang ở phiên bản mới nhất!")
+        return False
+    else:
+        print(f"Phiên bản launcher hiện tại đang cũ. Phiên bản mới nhất đang là {new_version}")
+        return True
+
+
+
+def check_and_download_files(folder_path):
+    if not os.path.exists(folder_path):
+        print(f"Thư mục {folder_path} không tồn tại.")
+        print(f"Tiến hành tạo thư mục {folder_path}.")
+        os.mkdir("C:/Users/"+user+"/Documents/GTA San Andreas User Files/SAMP/cache/15.235.197.168.7777")
+
+    files_in_folder = os.listdir(folder_path)
+
+    response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cache.json")
+    if response.status_code == 200:
+        required_files = response.json()
+        fileneeddownload = len(required_files)-len(files_in_folder)
+        print(f"Số file cần download: {fileneeddownload}")
+    else:
+        print(f"Lỗi khi lấy danh sách file từ máy chủ. Mã trạng thái: {response.status_code}")
+        return
+    
+    files_to_download = [file_name for file_name in required_files if file_name not in files_in_folder]
+
+    if files_to_download:
+        for file_name in files_to_download:
+            download_url = f"https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{file_name}"
+            download_path = os.path.join(folder_path, file_name)
+
+            response = requests.get(download_url)
+            if response.status_code == 200:
+                with open(download_path, 'wb') as file:
+                    file.write(response.content)
+                print(f"Tải file {file_name} thành công.")
+            else:
+                print(f"Lỗi khi tải file {file_name} từ máy chủ. Mã trạng thái: {response.status_code}")
+                error_output = "Tải cache thất bại từ URL: https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{}\n{}\n<@389385604598726657>".format(file_name,date)
+                send_discord_webhook(error_output)
+    else:
+        print("Không có file nào thiếu.")
 
 def calculate_sha256(file_path):
     sha256_hash = sha256()
@@ -40,32 +93,39 @@ def send_discord_webhook(message):
     try:
         response = requests.post("https://discord.com/api/webhooks/1181825984408850473/WjajVKE_In1lYb8ZYbvNw1ukL3GZvSBlHxfJ-RjMNxu6W5rPwuipT8INiD3HVsVPQN4F", data=json.dumps(payload), headers=headers)
         response.raise_for_status()
-        print("Webhook sent successfully.")
     except requests.exceptions.RequestException as e:
         print(f"Failed to send webhook: {e}")
 
 if __name__ == "__main__":
-    game_directory = r"D:/Download/Modpak/zin"
+    check_for_update()
+    if check_for_update == True:
+        print("Tiến hành lấy liên kết tải xuống.")
+        response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/updatelink.json")
+        if response.status_code == 200:
+            update_link = response.json()
+        else:
+            print(f"Lỗi khi kiểm tra cập nhật, mã phản hồi:{response.status_code}")
+        print("Tiến hành mở liên kết.")
+        os.system(update_link)
+
+    game_directory = r"D:/Download/Modpak/Zin"
+    print(f"Đường dẫn game của bạn: {game_directory}")
+    print("Đường dẫn cache của bạn: C:/Users/"+user+"/Documents/GTA San Andreas User Files/SAMP/cache/")
+    print("Tiến hành kiểm tra thư mục...")
     json_url = "https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/checksums.json"
 
     stored_checksums = fetch_json_from_url(json_url)
 
     if stored_checksums is not None:
         matching_files = scan_and_compare(game_directory, stored_checksums)
-
+        path = winreg.HKEY_CURRENT_USER
+        path_a = winreg.OpenKeyEx(path, r"SOFTWARE\\SAMP\\")
+        player = winreg.QueryValueEx(path_a, "PlayerName")
+        if path_a:
+            winreg.CloseKey(path_a)
         if matching_files:
-            path = winreg.HKEY_CURRENT_USER
-            path_a = winreg.OpenKeyEx(path, r"SOFTWARE\\SAMP\\")
-            player = winreg.QueryValueEx(path_a, "PlayerName")
-            if path_a:
-                winreg.CloseKey(path_a)
-            print("Các tệp trùng khớp:")
             for file_path in matching_files:
-                print(file_path)
-                message = "**Cleo detected!.**\nFilepath: {}\nIC: {}\nTime: {}".format(file_path,player[0],thoigian)
-                send_discord_webhook(message)
-            
-            
-        else:
-            print("Không có tệp trùng khớp.")
-            os.system("D:/Download/Modpak/Zin/samp.exe 51.254.139.153:7777")
+                    message = "**Cleo detected!.**\nFilepath: {}\nIC: {}\nTime: {}".format(file_path,player[0],thoigian)
+                    send_discord_webhook(message)
+    print("Kiểm tra hoàn tất, tiến hành tải xuống cache.")
+    check_and_download_files("C:/Users/"+user+"/Documents/GTA San Andreas User Files/SAMP/cache/15.235.197.168.7777")    

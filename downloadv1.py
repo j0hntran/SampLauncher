@@ -5,7 +5,6 @@ import random
 import time
 user = os.getlogin()
 date = time.ctime()
-errorcode = "ERROR-"+str(random.randint(0,999))
 def send_discord_webhook(message):
     payload = {"content": message}
     headers = {"Content-Type": "application/json"}
@@ -46,7 +45,7 @@ def check_and_download_files(folder_path):
                 print(f"Tải file {file_name} thành công.")
             else:
                 print(f"Lỗi khi tải file {file_name} từ máy chủ. Mã trạng thái: {response.status_code}")
-                error_output = "Tải cache thất bại từ URL: https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{}\n{}\nError Code: {}\n<@389385604598726657>".format(file_name,date,errorcode)
+                error_output = "Tải cache thất bại từ URL: https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{}\n{}\n<@389385604598726657>".format(file_name,date)
                 send_discord_webhook(error_output)
     else:
         print("Không có file nào thiếu.")
