@@ -3,23 +3,26 @@ import requests
 import winreg
 import json
 import time
+import webbrowser
 from hashlib import sha256
 thoigian = time.ctime()
 user = os.getlogin()
 date = time.ctime()
-launcher_version = 1.0
+launcher_version = "1.1"
 def check_for_update():
     response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/update.json")
     if response.status_code == 200:
-        new_version = response.json()
+        version = response.json()
     else:
         print(f"Lỗi khi kiểm tra cập nhật, mã phản hồi:{response.status_code}")
-    if launcher_version == new_version:
+    if launcher_version == version[0]:
         print("Bạn đang ở phiên bản mới nhất!")
-        return False
     else:
-        print(f"Phiên bản launcher hiện tại đang cũ. Phiên bản mới nhất đang là {new_version}")
-        return True
+        print(f"Phiên bản launcher hiện tại đang cũ. Phiên bản mới nhất đang là {version[0]}")
+        print("Tiến hành lấy liên kết tải xuống.")
+        print(f"Tiến hành mở liên kết: {version[1]}")
+        webbrowser.open(version[1])
+        quit()
 
 
 
@@ -35,9 +38,9 @@ def check_and_download_files(folder_path):
     if response.status_code == 200:
         required_files = response.json()
         fileneeddownload = len(required_files)-len(files_in_folder)
-        print(f"Số file cần download: {fileneeddownload}")
+        print(f"Số cache cần download: {fileneeddownload}")
     else:
-        print(f"Lỗi khi lấy danh sách file từ máy chủ. Mã trạng thái: {response.status_code}")
+        print(f"Lỗi khi lấy danh sách cache từ máy chủ. Mã trạng thái: {response.status_code}")
         return
     
     files_to_download = [file_name for file_name in required_files if file_name not in files_in_folder]
@@ -51,9 +54,9 @@ def check_and_download_files(folder_path):
             if response.status_code == 200:
                 with open(download_path, 'wb') as file:
                     file.write(response.content)
-                print(f"Tải file {file_name} thành công.")
+                print(f"Tải cache {file_name} thành công.")
             else:
-                print(f"Lỗi khi tải file {file_name} từ máy chủ. Mã trạng thái: {response.status_code}")
+                print(f"Lỗi khi tải cache {file_name} từ máy chủ. Mã trạng thái: {response.status_code}")
                 error_output = "Tải cache thất bại từ URL: https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/cachetest/{}\n{}\n<@389385604598726657>".format(file_name,date)
                 send_discord_webhook(error_output)
     else:
@@ -98,17 +101,7 @@ def send_discord_webhook(message):
 
 if __name__ == "__main__":
     check_for_update()
-    if check_for_update == True:
-        print("Tiến hành lấy liên kết tải xuống.")
-        response = requests.get("https://raw.githubusercontent.com/luuhoangductri/SampLauncher/main/updatelink.json")
-        if response.status_code == 200:
-            update_link = response.json()
-        else:
-            print(f"Lỗi khi kiểm tra cập nhật, mã phản hồi:{response.status_code}")
-        print("Tiến hành mở liên kết.")
-        os.system(update_link)
-
-    game_directory = r"D:/Download/Modpak/Zin"
+    game_directory = r"."
     print(f"Đường dẫn game của bạn: {game_directory}")
     print("Đường dẫn cache của bạn: C:/Users/"+user+"/Documents/GTA San Andreas User Files/SAMP/cache/")
     print("Tiến hành kiểm tra thư mục...")
