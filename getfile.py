@@ -17,7 +17,7 @@ def save_to_json(file_info, output_file):
         json.dump(file_info, json_file, indent=4)
 
 if __name__ == "__main__":
-    directory_path = "D:\Project\SampLauncher\cachetest"
+    directory_path = "D:\Project/15.235.197.168.7777"
 
     file_info = get_file_info(directory_path)
 
